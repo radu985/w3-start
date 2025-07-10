@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?
+  role      String   @default("customer") // "admin" or "customer"
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages     Message[]
+  chatSessions ChatSession[]
+}
+
+model Portfolio {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  aboutMe   String
+  location  String
+  email     String
+  github    String?
+  linkedin  String?
+  website   String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Skill {
+  id       String @id @default(cuid())
+  name     String
+  category String
+  level    Int
+  order    Int    @default(0)
+  icon     String?
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  imageUrl     String?
+  githubUrl    String?
+  liveUrl      String?
+  technologies String
+  featured     Boolean  @default(false)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  senderId  String
+  sessionId String
+  createdAt DateTime @default(now())
+
+  sender User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model ChatSession {
+  id          String    @id @default(cuid())
+  customerId  String    // Customer's email or ID
+  customerName String?
+  status      String    @default("active") // "active", "closed", "waiting"
+  lastMessage DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  messages Message[]
+  users    User[]
+}
