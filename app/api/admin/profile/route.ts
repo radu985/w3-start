@@ -23,7 +23,7 @@ export async function PUT(request: NextRequest) {
     if (password && password.length > 0) {
       updateData.password = await hashPassword(password)
     }
-
+    console.log('Updating 💫💫💫💫 profile with data:', user)
     await prisma.user.update({
       where: { id: user.id },
       data: updateData,
